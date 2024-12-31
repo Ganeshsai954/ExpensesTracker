@@ -3,6 +3,7 @@ package com.ravipatiganeshsai.expensestracker
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -167,16 +168,21 @@ fun EnterActivityScreen() {
 
                                 email.isBlank() -> {
                                     errorMessage = "Please enter your email."
+                                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                                 }
 
                                 password.isBlank() -> {
                                     errorMessage = "Please enter your password."
+                                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+
                                 }
 
 
                                 else -> {
                                     errorMessage = ""
 
+                                    context.startActivity(Intent(context, ExpenseTrackerActivity::class.java))
+                                    (context as Activity).finish()
 
                                 }
                             }
