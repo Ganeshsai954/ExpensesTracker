@@ -3,6 +3,7 @@ package com.ravipatiganeshsai.expensestracker
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.database.FirebaseDatabase
 
 class EnterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +59,13 @@ class EnterActivity : ComponentActivity() {
 fun EnterActivityScreenP() {
     EnterActivityScreen()
 }
+
+data class SpenderData(
+    var firstName: String = "",
+    var lastName: String = "",
+    var email: String = "",
+    var password: String = ""
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,36 +135,64 @@ fun EnterActivityScreen() {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Email TextField
+//                    OutlinedTextField(
+//                        value = email,
+//                        onValueChange = { email = it },
+//                        label = { Text("Email") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        colors = TextFieldDefaults.outlinedTextFieldColors(
+//                            containerColor = Color.LightGray
+//                        )
+//                    )
+
                     OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.LightGray
-                        )
+                        label = { Text("Enter Email") },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.LightGray,
+                            focusedContainerColor = Color.LightGray,
+                        ),
+                        shape = RoundedCornerShape(32.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Password TextField
                     var passwordVisible by remember { mutableStateOf(false) }
+//                    OutlinedTextField(
+//                        value = password,
+//                        onValueChange = { password = it },
+//                        label = { Text("Password") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        colors = TextFieldDefaults.outlinedTextFieldColors(
+//                            containerColor = Color.LightGray
+//                        ),
+//                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+//                        trailingIcon = {
+//                            Image(
+//                                painter = painterResource(id = R.drawable.baseline_password_24),
+//                                contentDescription = "Toggle Password Visibility",
+//                                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
+//                            )
+//                        }
+//                    )
+
                     OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Password") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.LightGray
+                        label = { Text("Enter Password") },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.LightGray,
+                            focusedContainerColor = Color.LightGray,
                         ),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_password_24),
-                                contentDescription = "Toggle Password Visibility",
-                                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
-                            )
-                        }
+                        shape = RoundedCornerShape(32.dp)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -179,10 +216,38 @@ fun EnterActivityScreen() {
 
 
                                 else -> {
-                                    errorMessage = ""
 
-                                    context.startActivity(Intent(context, ExpenseTrackerActivity::class.java))
-                                    (context as Activity).finish()
+
+
+                                    val spenderData = SpenderData(
+                                        email = email,
+                                        password = password
+                                    )
+
+                                    FirebaseDatabase.getInstance().getReference("SpenderDetails").child(spenderData.email.replace(".", ",")).get().addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            val userData = task.result?.getValue(SpenderData::class.java)
+                                            if (userData != null) {
+                                                if (userData.password == spenderData.password) {
+                                                    Toast.makeText(context, "Start Tracking your expenses", Toast.LENGTH_SHORT).show()
+                                                    SpenderDetails.storeUserSession(context,true)
+                                                    SpenderDetails.storeSpenderMail(context,spenderData.email)
+                                                    context.startActivity(Intent(context, ExpenseTrackerActivity::class.java))
+                                                    (context as Activity).finish()
+                                                } else {
+                                                    Toast.makeText(context, "Incorrect Credentials", Toast.LENGTH_SHORT).show()
+                                                }
+                                            } else {
+                                                Toast.makeText(context, "Account not found", Toast.LENGTH_SHORT).show()
+                                            }
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "Something went wrong",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
 
                                 }
                             }
@@ -200,7 +265,7 @@ fun EnterActivityScreen() {
 
                     // Footer Text
                     Row {
-                        Text(text = "Do you have an account? ", color = Color.Black)
+                        Text(text = "New User? ", color = Color.Black)
                         Text(
                             text = "Sign Up",
                             color = Color.Blue,

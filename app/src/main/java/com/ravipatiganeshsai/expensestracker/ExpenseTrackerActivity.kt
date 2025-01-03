@@ -1,11 +1,11 @@
 package com.ravipatiganeshsai.expensestracker
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,8 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class ExpenseTrackerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,8 +57,7 @@ fun ExpenseTrackerScreen() {
         ) {
             Image(
                 modifier = Modifier
-                    .size(32.dp)
-                    ,
+                    .size(32.dp),
                 painter = painterResource(id = R.drawable.expenses),
                 contentDescription = "back"
             )
@@ -98,6 +95,7 @@ fun ExpenseTrackerScreen() {
                         .width(100.dp)
                         .height(100.dp)
                         .clickable {
+                            context.startActivity(Intent(context, AddBillActivity::class.java))
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -123,6 +121,8 @@ fun ExpenseTrackerScreen() {
                         .width(100.dp)
                         .height(100.dp)
                         .clickable {
+                            SummaryType.click = 1
+                            context.startActivity(Intent(context, ExpensesSummary::class.java))
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -149,6 +149,9 @@ fun ExpenseTrackerScreen() {
                         .width(100.dp)
                         .height(100.dp)
                         .clickable {
+                            SummaryType.click = 2
+                            context.startActivity(Intent(context, ExpensesSummary::class.java))
+
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -183,6 +186,9 @@ fun ExpenseTrackerScreen() {
                         .width(100.dp)
                         .height(100.dp)
                         .clickable {
+                            SummaryType.usType = 1
+                            context.startActivity(Intent(context, ContactUsActivity::class.java))
+
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -208,6 +214,9 @@ fun ExpenseTrackerScreen() {
                         .width(100.dp)
                         .height(100.dp)
                         .clickable {
+                            SummaryType.usType = 2
+                            context.startActivity(Intent(context, ContactUsActivity::class.java))
+
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -234,6 +243,7 @@ fun ExpenseTrackerScreen() {
                         .width(100.dp)
                         .height(100.dp)
                         .clickable {
+                            logout(context)
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -256,4 +266,55 @@ fun ExpenseTrackerScreen() {
             }
         }
     }
+}
+
+fun logout(context: Context) {
+    SpenderDetails.storeUserSession(context, false)
+    val intent = Intent(context, EnterActivity::class.java)
+    intent.flags =
+        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    context.startActivity(intent)
+    (context as Activity).finish()
+}
+
+object SummaryType {
+    var click = 0
+    var usType = 0
+}
+
+object SpenderDetails {
+
+    fun storeUserSession(context: Context, value: Boolean) {
+        val studentStatus = context.getSharedPreferences("EXPENSES_TRACKER", Context.MODE_PRIVATE)
+        val editor = studentStatus.edit()
+        editor.putBoolean("SPENDER_SESSION", value).apply()
+    }
+
+    fun getUserSession(context: Context): Boolean {
+        val studentStatus = context.getSharedPreferences("EXPENSES_TRACKER", Context.MODE_PRIVATE)
+        return studentStatus.getBoolean("SPENDER_SESSION", false)
+    }
+
+    fun storeSpenderMail(context: Context, value: String) {
+        val studentMail = context.getSharedPreferences("EXPENSES_TRACKER", Context.MODE_PRIVATE)
+        val editor = studentMail.edit()
+        editor.putString("SPENDER_MAIL", value).apply()
+    }
+
+    fun getSpenderMail(context: Context): String {
+        val studentMail = context.getSharedPreferences("EXPENSES_TRACKER", Context.MODE_PRIVATE)
+        return studentMail.getString("SPENDER_MAIL", "")!!
+    }
+
+    fun storeSpenderName(context: Context, value: String) {
+        val studentName = context.getSharedPreferences("EXPENSES_TRACKER", Context.MODE_PRIVATE)
+        val editor = studentName.edit()
+        editor.putString("SPENDER_NAME", value).apply()
+    }
+
+    fun getSpenderName(context: Context): String {
+        val studentName = context.getSharedPreferences("EXPENSES_TRACKER", Context.MODE_PRIVATE)
+        return studentName.getString("SPENDER_NAME", "")!!
+    }
+
 }

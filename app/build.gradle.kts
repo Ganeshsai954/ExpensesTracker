@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-//    id("com.google.gms.google-services")
+    kotlin("kapt")
+
+    id("com.google.gms.google-services")
 
 }
 
@@ -84,6 +86,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
+    implementation(libs.firebase.database.ktx)
+//    implementation(libs.androidx.room.common)
+//    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -91,6 +96,20 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+//    implementation("androidx.room:room-common:2.5.2")
+//    implementation("androidx.room:room-ktx:2.5.2")
+//    kapt("androidx.room:room-compiler:2.5.2")
+
+    implementation("com.google.code.gson:gson:2.8.8")
+
+//    def room_version = "2.4.3"
+    implementation("androidx.room:room-runtime:2.5.2")
+    implementation("androidx.room:room-ktx:2.5.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.2.1")
+    annotationProcessor("androidx.room:room-compiler:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
+
+
 
 //    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
 //    implementation("com.google.firebase:firebase-analytics")

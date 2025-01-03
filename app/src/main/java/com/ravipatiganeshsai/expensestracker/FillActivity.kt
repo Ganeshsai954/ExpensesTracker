@@ -3,6 +3,8 @@ package com.ravipatiganeshsai.expensestracker
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.database.FirebaseDatabase
 
 class FillActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +66,7 @@ fun FillActivityScreen() {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
-    var FullName by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
     var Lastname by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
@@ -128,82 +131,151 @@ fun FillActivityScreen() {
                 ) {
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Login Title
-
 
                     Spacer(modifier = Modifier.height(24.dp))
 
+//                    OutlinedTextField(
+//                        value = firstName,
+//                        onValueChange = { firstName = it },
+//                        label = { Text("Full Name") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        colors = TextFieldDefaults.outlinedTextFieldColors(
+//                            containerColor = Color.LightGray
+//                        )
+//                    )
+
                     OutlinedTextField(
-                        value = FullName,
-                        onValueChange = { FullName = it },
-                        label = { Text("Full Name") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.LightGray
-                        )
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        value = firstName,
+                        onValueChange = { firstName = it },
+                        label = { Text("First Name") },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.LightGray,
+                            focusedContainerColor = Color.LightGray,
+                        ),
+                        shape = RoundedCornerShape(32.dp)
                     )
 
 
                     // Last Name TextField
+//                    OutlinedTextField(
+//                        value = Lastname,
+//                        onValueChange = { Lastname = it },
+//                        label = { Text("Last Name") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        colors = TextFieldDefaults.outlinedTextFieldColors(
+//                            containerColor = Color.LightGray
+//                        )
+//                    )
+
                     OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
                         value = Lastname,
                         onValueChange = { Lastname = it },
                         label = { Text("Last Name") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.LightGray
-                        )
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.LightGray,
+                            focusedContainerColor = Color.LightGray,
+                        ),
+                        shape = RoundedCornerShape(32.dp)
                     )
 
+
                     // Email TextField
+//                    OutlinedTextField(
+//                        value = email,
+//                        onValueChange = { email = it },
+//                        label = { Text("Email") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        colors = TextFieldDefaults.outlinedTextFieldColors(
+//                            containerColor = Color.LightGray
+//                        )
+//                    )
+
                     OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Email") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.LightGray
-                        )
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.LightGray,
+                            focusedContainerColor = Color.LightGray,
+                        ),
+                        shape = RoundedCornerShape(32.dp)
                     )
 
 
                     // Password TextField
                     var passwordVisible by remember { mutableStateOf(false) }
+//                    OutlinedTextField(
+//                        value = password,
+//                        onValueChange = { password = it },
+//                        label = { Text("Password") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        colors = TextFieldDefaults.outlinedTextFieldColors(
+//                            containerColor = Color.LightGray
+//                        ),
+//                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+//                        trailingIcon = {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.baseline_password_24),
+//                                contentDescription = "Toggle Password Visibility",
+//                                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
+//                            )
+//                        }
+//                    )
+
                     OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Password") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.LightGray
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.LightGray,
+                            focusedContainerColor = Color.LightGray,
                         ),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_password_24),
-                                contentDescription = "Toggle Password Visibility",
-                                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
-                            )
-                        }
+                        shape = RoundedCornerShape(32.dp)
                     )
 
 
+//                    OutlinedTextField(
+//                        value = confirmPassword,
+//                        onValueChange = { confirmPassword = it },
+//                        label = { Text("Confirm Password") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        colors = TextFieldDefaults.outlinedTextFieldColors(
+//                            containerColor = Color.LightGray
+//                        ),
+//                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+//                        trailingIcon = {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.baseline_password_24),
+//                                contentDescription = "Toggle Password Visibility",
+//                                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
+//                            )
+//                        }
+//                    )
+
                     OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
                         label = { Text("Confirm Password") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.LightGray
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.LightGray,
+                            focusedContainerColor = Color.LightGray,
                         ),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_password_24),
-                                contentDescription = "Toggle Password Visibility",
-                                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
-                            )
-                        }
+                        shape = RoundedCornerShape(32.dp)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -212,31 +284,95 @@ fun FillActivityScreen() {
                     Button(
                         onClick = {
                             when {
-                                FullName.isBlank() -> {
-                                    errorMessage = "Please enter your full name."
+                                firstName.isBlank() -> {
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter your full name",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
 
                                 Lastname.isBlank() -> {
-                                    errorMessage = "Please enter your last name."
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter your last name",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
                                 }
 
                                 email.isBlank() -> {
-                                    errorMessage = "Please enter your email."
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter your email",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
                                 }
 
                                 password.isBlank() -> {
-                                    errorMessage = "Please enter your password."
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter your password",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
                                 }
 
-                                confirmPassword.isBlank() -> {
-                                    errorMessage = "Please confirm your password."
-                                }
+                                (password != confirmPassword) -> {
+                                    Toast.makeText(
+                                        context,
+                                        "Passwords doesn't match",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 
+                                }
 
                                 else -> {
-                                    errorMessage = ""
+
+                                    val spenderData = SpenderData(
+                                        firstName,
+                                        Lastname,
+                                        email,
+                                        password
+                                    )
 
 
+                                    try {
+                                        FirebaseDatabase.getInstance()
+                                            .getReference("SpenderDetails")
+                                            .child(spenderData.email.replace(".", ","))
+                                            .setValue(spenderData)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Now you can track your expense easily, Start Now",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                        .show()
+                                                    context.startActivity(
+                                                        Intent(
+                                                            context,
+                                                            EnterActivity::class.java
+                                                        )
+                                                    )
+                                                    (context as Activity).finish()
+
+                                                } else {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Something went wrong",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            }
+                                            .addOnFailureListener { _ ->
+                                                Log.e("Test", "Something went wrong")
+                                            }
+                                    } catch (e: Exception) {
+                                        Log.e("Test", e.message.toString())
+                                    }
                                 }
                             }
                         },
@@ -267,6 +403,10 @@ fun FillActivityScreen() {
                 }
             }
         }
+
+
     }
+
+
 }
 

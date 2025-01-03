@@ -1,6 +1,5 @@
 package com.ravipatiganeshsai.expensestracker
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,11 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,39 +27,44 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ExpensesPointCheck()
+            ExpensesPointCheck(::verifySpenderStatus)
         }
+    }
+
+    private fun verifySpenderStatus(userSessionStatus: Int) {
+        if (userSessionStatus == 2) {
+            startActivity(Intent(this, EnterActivity::class.java))
+            finish()
+        } else {
+            startActivity(Intent(this, ExpenseTrackerActivity::class.java))
+            finish()
+        }
+
     }
 }
 
+
 @Composable
-fun ExpensesPointCheck() {
-    var showSplash by remember { mutableStateOf(true) }
+fun ExpensesPointCheck(onLoginClick: (studentStatus: Int) -> Unit) {
+    val context = LocalContext.current
 
-    val context = LocalContext.current as Activity
-
-    LaunchedEffect(Unit) {
-        delay(3000)
-        showSplash = false
-
-
-    }
-    if (showSplash) {
-        ExpensesPoint()
-
-    } else {
-
-        context.startActivity(Intent(context, EnterActivity::class.java))
-        context.finish()
-
+    SideEffect {
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(3000)
+            onLoginClick(if (SpenderDetails.getUserSession(context)) 1 else 2)
+        }
     }
 
+    ExpensesPoint()
 }
 
 
@@ -82,13 +82,15 @@ fun ExpensesPoint() {
             verticalArrangement = Arrangement.Center
         ) {
 
+            Spacer(modifier = Modifier.weight(1f))
+
             Image(
                 painter = painterResource(id = R.drawable.expenses),
                 contentDescription = "Expenses Tracker Image",
                 modifier = Modifier.size(200.dp)
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
             Text(
                 text = "Expenses Tracker",
@@ -105,13 +107,15 @@ fun ExpensesPoint() {
             Text(
                 text = "By Ravipati Ganesh Sai",
                 color = Color.White,
-                fontSize = 32.sp,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(bottom = 24.dp)
                     .align(Alignment.CenterHorizontally)
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
 
         }
